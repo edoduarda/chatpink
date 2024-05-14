@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chat🎀</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="container">
+        <div class="chat-container">
+            <div class="user-info">
+                <br>
+                <img src="img/icon.jpg" alt="Avatar do usuário" class="avatar">
+                <h2 class="user-name"><input type="text" id="nome" class="input-nome" placeholder="Nome de usuário"></h2>
+            </div>
+            <ul id="mensagens" class="chat-messages"></ul>
+
+
+
+    
+        
+            <div class="chat-input">
+                <input type="text" id="mensagem" class="input-mensagem" placeholder="Sua mensagem">
+                <button id="enviar" class="btn-enviar">Enviar</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="/socket.io/socket.io.js"></script>
+    <script>
+        const socket = io();
+        const nomeInput = document.getElementById('nome');
+        const mensagemInput = document.getElementById('mensagem');
+        const enviarButton = document.getElementById('enviar');
+        const mensagens = document.getElementById('mensagens');
+
+        enviarButton.addEventListener('click', enviarMensagem);
+
+        mensagemInput.addEventListener('keydown', (event) => {
+            if (event.key === 'Enter') {
+                enviarMensagem();
+            }
+        });
+
+        function enviarMensagem() {
+            const nome = nomeInput.value;
+            const mensagem = mensagemInput.value;
+
+            if (nome.trim() !== '' && mensagem.trim() !== '') {
+                socket.emit('chat message', { nome, mensagem });
+                mensagemInput.value = '';
+                nomeInput.disabled = true;
+            } else {
+                alert('Por favor, preencha todos os campos.');
+            }
+        }
+
+        socket.on('chat message', dados => {
+            const novaMensagem = document.createElement('li');
+            novaMensagem.textContent = `${dados.nome}: ${dados.mensagem}`;
+
+            if (dados.nome === 'usuario1') {
+                novaMensagem.classList.add('user1-message');
+            }
+            mensagens.appendChild(novaMensagem);
+        });
+    </script>
+</body>
+</html>
